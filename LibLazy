@@ -1,7 +1,7 @@
 --!strict
 --[[
 ====================================================================
-    UI Library v3.0  Theme System + Christmas Effect
+    UI Library v3.0 — TIMO MOD + Theme System + Christmas Effect
     ✅ Dropdown chọn theme ✅ Hiệu ứng tuyết rơi Giáng Sinh ✅ Nút Áp dụng
 ====================================================================
 ]]
@@ -613,24 +613,11 @@ function Library:CreateWindow(title, openKey, floatIconId)
     if floatIconId then self:SetFloatingIcon(floatIconId) end
 
     -- ===== CẬP NHẬT TOÀN BỘ THEME =====
-    local themeElements = {
-        MainBg = Main,
-        MainStroke = MainStroke,
-        Crown = Crown,
-        TitleBarLine = TitleBarLine,
-        BtnSettings = BtnSettings,
-        BtnClose = BtnClose,
-        Line = Line,
-        Floating = Floating,
-    }
-    self._themeElements = themeElements
-
     function self:ApplyTheme(themeName)
         local th = THEMES[themeName] or THEMES.Black
         ACTIVE_THEME = themeName
         THEME = th
 
-        -- Cập nhật các phần tử chính
         Main.BackgroundColor3 = th.Bg
         MainStroke.Color = th.Accent
         Crown.BackgroundColor3 = th.Accent
@@ -640,7 +627,6 @@ function Library:CreateWindow(title, openKey, floatIconId)
         Line.BackgroundColor3 = th.Card
         Floating.BackgroundColor3 = th.Accent
 
-        -- Bật/tắt hiệu ứng Giáng Sinh
         if themeName == "Christmas" then
             startChristmasEffect(Gui)
         else
@@ -717,7 +703,7 @@ function Library:CreateTab(name)
         corner(10).Parent = Row
 
         local Lbl = Instance.new("TextLabel")
-        Lbl.Size = UDim2.new(1, -80, 1, 0)
+        Lbl.Size = UDim2.new(1, -160, 1, 0)
         Lbl.Position = UDim2.new(0, 14, 0, 0)
         Lbl.BackgroundTransparency = 1
         Lbl.Text = label
@@ -728,8 +714,8 @@ function Library:CreateTab(name)
         Lbl.Parent = Row
 
         local SelectedBtn = Instance.new("TextButton")
-        SelectedBtn.Size = UDim2.new(0, 140, 0, 36)
-        SelectedBtn.Position = UDim2.new(1, -154, 0.5, -18)
+        SelectedBtn.Size = UDim2.new(0, 130, 0, 36)
+        SelectedBtn.Position = UDim2.new(1, -144, 0.5, -18)
         SelectedBtn.BackgroundColor3 = THEME.Accent
         SelectedBtn.Text = selected
         SelectedBtn.TextColor3 = THEME.White
@@ -739,8 +725,8 @@ function Library:CreateTab(name)
         corner(8).Parent = SelectedBtn
 
         local DropList = Instance.new("Frame")
-        DropList.Size = UDim2.new(0, 140, 0, 0)
-        DropList.Position = UDim2.new(1, -154, 1, 4)
+        DropList.Size = UDim2.new(0, 130, 0, 0)
+        DropList.Position = UDim2.new(1, -144, 1, 4)
         DropList.BackgroundColor3 = THEME.Card
         DropList.Visible = false
         DropList.ClipsDescendants = true
@@ -751,7 +737,7 @@ function Library:CreateTab(name)
         local DropLayout = Instance.new("UIListLayout")
         DropLayout.Padding = UDim.new(0, 2)
         DropLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        DropLayout.Parent = DropLayout
+        DropLayout.Parent = DropList
 
         local function buildList()
             for _, c in ipairs(DropList:GetChildren()) do if c:IsA("GuiObject") then c:Destroy() end end
@@ -775,7 +761,7 @@ function Library:CreateTab(name)
                     buildList()
                 end)
             end
-            DropList.CanvasSize = UDim2.new(0, 0, 0, #options * 36)
+            DropList.AutomaticSize = Enum.AutomaticSize.Y
         end
         buildList()
 
