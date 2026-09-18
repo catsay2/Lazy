@@ -41,4 +41,22 @@ local ok, err = pcall(function()
     end
 
     -- Tạo Menu
-    local Window
+    local Window = Library:CreateWindow(
+        "LAZY MENU",
+        Enum.KeyCode.RightControl,
+        "rbxassetid://123101346872827"
+    )
+
+    -- TAB 1: Menu Chính
+    local Tab1 = Window:CreateTab("Menu Chính")
+    Tab1:CreateSection("Tùy chọn chung")
+    Tab1:CreateToggle("Tùy chọn 1", function(s) print("Tùy chọn 1:", s) end)
+    Tab1:CreateSlider("Giá trị", 0, 100, 50, function(v) print("Giá trị:", v) end)
+
+    -- TAB 2: Hệ thống & Theme
+    local TabHeThong = Window:CreateTab("Hệ thống")
+    TabHeThong:CreateSection("Cài đặt giao diện")
+    
+    -- Dropdown chọn theme
+    local selectedTheme = "Black"
+    local ThemeDropdown = TabHeThong:CreateDropdown("Chọn Theme", {"Black", "DarkBlue", "Purple", "Christmas
