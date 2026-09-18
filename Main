@@ -1,0 +1,45 @@
+--!strict
+--[[
+    Main.client.luau — LocalScript
+    Đặt cùng cấp với UILibrary trong StarterPlayerScripts
+    (File .client.luau = LocalScript khi dùng Rojo)
+]]
+
+local Library = require(script.Parent:WaitForChild("UILibrary"))
+
+-- Tạo menu:
+--   tham số 1: tên menu
+--   tham số 2: phím tắt ẩn/hiện
+--   tham số 3: asset id icon nút tròn nổi (đã đặt sẵn của bạn)
+local Window = Library:CreateWindow(
+    "MENU CỦA TÔI",
+    Enum.KeyCode.RightControl,
+    "rbxassetid://123101346872827"
+)
+
+-- Nếu icon không hiện: có thể ID này là Decal, hãy lấy Image ID thật
+-- (mở trang asset → xem ảnh → copy ID trong URL của ảnh)
+-- Window:SetFloatingIcon("rbxassetid://<image_id_thật>")
+
+-- ===== TAB 1: Menu Chính =====
+local TabChinh = Window:CreateTab("Menu Chính")
+TabChinh:CreateSection("Tùy chọn chung")
+
+TabChinh:CreateToggle("Hiển thị FPS", function(state)
+    print("FPS hiển thị:", state)
+end)
+
+TabChinh:CreateSlider("Âm lượng", 0, 100, 50, function(val)
+    print("Âm lượng:", val)
+end)
+
+TabChinh:CreateButton("Lưu cài đặt", function()
+    print("Đã lưu!")
+end)
+
+-- ===== TAB 2: Khác =====
+local TabKhac = Window:CreateTab("Tab Khác")
+TabKhac:CreateToggle("Tùy chọn A", function(s)
+    print("Tùy chọn A:", s)
+end)
+
