@@ -1,63 +1,20 @@
--- Loader cho Executor
-local function showError(msg)
-    warn("[Menu Error]", tostring(msg))
-    pcall(function()
-        local sg = Instance.new("ScreenGui")
-        sg.ResetOnSpawn = false
-        sg.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
-        local lbl = Instance.new("TextLabel")
-        lbl.Size = UDim2.new(0, 400, 0, 120)
-        lbl.Position = UDim2.new(0, 20, 0, 20)
-        lbl.BackgroundColor3 = Color3.fromRGB(180, 30, 30)
-        lbl.BackgroundTransparency = 0.2
-        lbl.Text = "LỖI: " .. tostring(msg)
-        lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
-        lbl.TextSize = 16
-        lbl.TextWrapped = true
-        lbl.Font = Enum.Font.GothamSemibold
-        lbl.Parent = sg
-        task.delay(10, function() sg:Destroy() end)
-    end)
-end
-
+-- ==================================================
+--  MAIN — GỌI THƯ VIỆN + TẠO MENU
+-- ==================================================
 local ok, err = pcall(function()
-    if typeof(game.HttpGet) ~= "function" then
-        error("Không có game:HttpGet — hãy dùng trong executor")
-    end
-
-    local src = game:HttpGet("https://raw.githubusercontent.com/catsay2/Lazy/refs/heads/main/LibLazy")
-    if not src or src == "" or string.find(src, "404") then
-        error("Không tải được LibLazy")
-    end
-
-    local fn = loadstring(src)
-    if not fn then
-        error("Lỗi cú pháp LibLazy")
-    end
-
-    local Library = fn()
+    -- Tải thư viện LibLazy
+    local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/catsay2/Lazy/refs/heads/main/LibLazy"))()
     if not Library or not Library.CreateWindow then
-        error("LibLazy thiếu return Library")
+        error("Không tải được LibLazy — kiểm tra kết nối")
     end
 
-    -- Tạo Menu
-    local Window = Library:CreateWindow(
-        "LAZY MENU",
-        Enum.KeyCode.RightControl,
-        "rbxassetid://123101346872827"
-    )
+    -- Tạo cửa sổ menu
+    local Window = Library:CreateWindow("LAZY MENU", Enum.KeyCode.RightControl)
 
-    -- TAB 1: Menu Chính
-    local Tab1 = Window:CreateTab("Menu Chính")
-    Tab1:CreateSection("Tùy chọn chung")
-    Tab1:CreateToggle("Tùy chọn 1", function(s) print("Tùy chọn 1:", s) end)
-    Tab1:CreateSlider("Giá trị", 0, 100, 50, function(v) print("Giá trị:", v) end)
-
-    -- TAB 2: Hệ thống & Theme
+    -- ===== TAB 1: HỆ THỐNG =====
     local TabHeThong = Window:CreateTab("Hệ thống")
     TabHeThong:CreateSection("Cài đặt giao diện")
-    
-    -- Dropdown chọn theme
+
     local selectedTheme = "Black"
     local ThemeDropdown = TabHeThong:CreateDropdown(
         "Chọn Theme",
@@ -68,25 +25,42 @@ local ok, err = pcall(function()
         end
     )
 
-    -- Nút Áp dụng Theme
     TabHeThong:CreateButton("✅ Áp dụng Theme", function()
         Window:ApplyTheme(selectedTheme)
         warn("✅ Đã áp dụng theme:", selectedTheme)
     end)
 
-    -- Thêm nút đóng/mở hướng dẫn
-    TabHeThong:CreateSection("Hướng dẫn")
-    TabHeThong:CreateButton("ℹ️ Hiển thị hướng dẫn", function()
-        print("=== HƯỚNG DẪN ===")
-        print("🔹 Nhấn phím RightControl để mở/đóng menu")
-        print("🔹 Chọn theme → bấm Áp dụng để đổi màu")
-        print("🔹 Theme Christmas: nền đen + tuyết rơi ❄️🎄⛄🎁")
+    -- ===== TAB 2: MENU CHÍNH =====
+    local Tab1 = Window:CreateTab("Menu Chính")
+    Tab1:CreateSection("Tùy chọn chung")
+    Tab1:CreateToggle("Tùy chọn 1", function(s)
+        print("Tùy chọn 1:", s)
+    end)
+    Tab1:CreateSlider("Giá trị", 0, 100, 50, function(v)
+        print("Giá trị:", v)
     end)
 
-    warn("✅ Menu đã tải thành công! Nhấn RightControl để mở")
+    warn("====================================")
+    warn("✅ MENU SẴN SÀNG!")
+    warn("⌨️  Nhấn RIGHT CONTROL để mở")
+    warn("====================================")
 end)
 
 if not ok then
-    showError(err or "Lỗi không xác định")
-    warn("❌ Lỗi:", err)
+    warn("❌ LỖI:", err)
+    local sg = Instance.new("ScreenGui")
+    sg.ResetOnSpawn = false
+    sg.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(0, 400, 0, 120)
+    lbl.Position = UDim2.new(0, 20, 0, 20)
+    lbl.BackgroundColor3 = Color3.fromRGB(180, 30, 30)
+    lbl.BackgroundTransparency = 0.2
+    lbl.Text = "LỖI: " .. tostring(err)
+    lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+    lbl.TextSize = 16
+    lbl.TextWrapped = true
+    lbl.Font = Enum.Font.GothamSemibold
+    lbl.Parent = sg
+    task.delay(10, function() sg:Destroy() end)
 end
