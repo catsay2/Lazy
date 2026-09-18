@@ -41,24 +41,4 @@ local ok, err = pcall(function()
     end
 
     -- Tạo Menu
-    local Window = Library:CreateWindow(
-        "LAZY MENU",
-        Enum.KeyCode.RightControl,
-        "rbxassetid://123101346872827"
-    )
-
-    -- TAB 1: Menu Chính
-    local Tab1 = Window:CreateTab("Menu Chính")
-    Tab1:CreateSection("Tùy chọn chung")
-    Tab1:CreateToggle("Tùy chọn 1", function(s) print("Tùy chọn 1:", s) end)
-    Tab1:CreateSlider("Giá trị", 0, 100, 50, function(v) print("Giá trị:", v) end)
-    Tab1:CreateButton("Nút test", function() print("Đã bấm!") end)
-
-    -- TAB 2
-    local Tab2 = Window:CreateTab("Tab Khác")
-    Tab2:CreateToggle("Tùy chọn A", function(s) print(s) end)
-end)
-
-if not ok then
-    showError(err)
-end
+    local Window
