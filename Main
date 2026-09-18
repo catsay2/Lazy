@@ -59,4 +59,34 @@ local ok, err = pcall(function()
     
     -- Dropdown chọn theme
     local selectedTheme = "Black"
-    local ThemeDropdown = TabHeThong:CreateDropdown("Chọn Theme", {"Black", "DarkBlue", "Purple", "Christmas
+    local ThemeDropdown = TabHeThong:CreateDropdown(
+        "Chọn Theme",
+        {"Black", "DarkBlue", "Purple", "Christmas"},
+        "Black",
+        function(themeName)
+            selectedTheme = themeName
+        end
+    )
+
+    -- Nút Áp dụng Theme
+    TabHeThong:CreateButton("✅ Áp dụng Theme", function()
+        Window:ApplyTheme(selectedTheme)
+        warn("✅ Đã áp dụng theme:", selectedTheme)
+    end)
+
+    -- Thêm nút đóng/mở hướng dẫn
+    TabHeThong:CreateSection("Hướng dẫn")
+    TabHeThong:CreateButton("ℹ️ Hiển thị hướng dẫn", function()
+        print("=== HƯỚNG DẪN ===")
+        print("🔹 Nhấn phím RightControl để mở/đóng menu")
+        print("🔹 Chọn theme → bấm Áp dụng để đổi màu")
+        print("🔹 Theme Christmas: nền đen + tuyết rơi ❄️🎄⛄🎁")
+    end)
+
+    warn("✅ Menu đã tải thành công! Nhấn RightControl để mở")
+end)
+
+if not ok then
+    showError(err or "Lỗi không xác định")
+    warn("❌ Lỗi:", err)
+end
