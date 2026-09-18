@@ -1,45 +1,64 @@
---!strict
---[[
-    Main.client.luau — LocalScript
-    Đặt cùng cấp với UILibrary trong StarterPlayerScripts
-    (File .client.luau = LocalScript khi dùng Rojo)
-]]
+-- Loader cho Executor
+local function showError(msg)
+    warn("[Menu Error]", tostring(msg))
+    pcall(function()
+        local sg = Instance.new("ScreenGui")
+        sg.ResetOnSpawn = false
+        sg.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+        local lbl = Instance.new("TextLabel")
+        lbl.Size = UDim2.new(0, 400, 0, 120)
+        lbl.Position = UDim2.new(0, 20, 0, 20)
+        lbl.BackgroundColor3 = Color3.fromRGB(180, 30, 30)
+        lbl.BackgroundTransparency = 0.2
+        lbl.Text = "LỖI: " .. tostring(msg)
+        lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+        lbl.TextSize = 16
+        lbl.TextWrapped = true
+        lbl.Font = Enum.Font.GothamSemibold
+        lbl.Parent = sg
+        task.delay(10, function() sg:Destroy() end)
+    end)
+end
 
-local Library = require(script.Parent:WaitForChild("UILibrary"))
+local ok, err = pcall(function()
+    if typeof(game.HttpGet) ~= "function" then
+        error("Không có game:HttpGet — hãy dùng trong executor")
+    end
 
--- Tạo menu:
---   tham số 1: tên menu
---   tham số 2: phím tắt ẩn/hiện
---   tham số 3: asset id icon nút tròn nổi (đã đặt sẵn của bạn)
-local Window = Library:CreateWindow(
-    "MENU CỦA TÔI",
-    Enum.KeyCode.RightControl,
-    "rbxassetid://123101346872827"
-)
+    local src = game:HttpGet("https://raw.githubusercontent.com/catsay2/Lazy/refs/heads/main/LibLazy")
+    if not src or src == "" or string.find(src, "404") then
+        error("Không tải được LibLazy")
+    end
 
--- Nếu icon không hiện: có thể ID này là Decal, hãy lấy Image ID thật
--- (mở trang asset → xem ảnh → copy ID trong URL của ảnh)
--- Window:SetFloatingIcon("rbxassetid://<image_id_thật>")
+    local fn = loadstring(src)
+    if not fn then
+        error("Lỗi cú pháp LibLazy")
+    end
 
--- ===== TAB 1: Menu Chính =====
-local TabChinh = Window:CreateTab("Menu Chính")
-TabChinh:CreateSection("Tùy chọn chung")
+    local Library = fn()
+    if not Library or not Library.CreateWindow then
+        error("LibLazy thiếu return Library")
+    end
 
-TabChinh:CreateToggle("Hiển thị FPS", function(state)
-    print("FPS hiển thị:", state)
+    -- Tạo Menu
+    local Window = Library:CreateWindow(
+        "LAZY MENU",
+        Enum.KeyCode.RightControl,
+        "rbxassetid://123101346872827"
+    )
+
+    -- TAB 1: Menu Chính
+    local Tab1 = Window:CreateTab("Menu Chính")
+    Tab1:CreateSection("Tùy chọn chung")
+    Tab1:CreateToggle("Tùy chọn 1", function(s) print("Tùy chọn 1:", s) end)
+    Tab1:CreateSlider("Giá trị", 0, 100, 50, function(v) print("Giá trị:", v) end)
+    Tab1:CreateButton("Nút test", function() print("Đã bấm!") end)
+
+    -- TAB 2
+    local Tab2 = Window:CreateTab("Tab Khác")
+    Tab2:CreateToggle("Tùy chọn A", function(s) print(s) end)
 end)
 
-TabChinh:CreateSlider("Âm lượng", 0, 100, 50, function(val)
-    print("Âm lượng:", val)
-end)
-
-TabChinh:CreateButton("Lưu cài đặt", function()
-    print("Đã lưu!")
-end)
-
--- ===== TAB 2: Khác =====
-local TabKhac = Window:CreateTab("Tab Khác")
-TabKhac:CreateToggle("Tùy chọn A", function(s)
-    print("Tùy chọn A:", s)
-end)
-
+if not ok then
+    showError(err)
+end
