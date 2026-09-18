@@ -2,7 +2,9 @@
 --[[
 ====================================================================
     UI Library v1.1 — Dark theme menu
-    Mới: ⚙ Settings panel (toggle) + ✕ thu nhỏ thành nút tròn nổi
+    Features: tabs / toggle / slider / button / section
+              ⚙ Settings panel (live FPS, Ping, RAM, device...)
+              ✕ Thu nhỏ thành nút tròn nổi (kéo thả được, đổi icon)
 ====================================================================
 ]]
 local Library = {}
@@ -23,10 +25,26 @@ local THEME = {
     White     = Color3.fromRGB(255, 255, 255),
 }
 
-local function corner(r) local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, r); return c end
-local function stroke(color, thick) local s = Instance.new("UIStroke"); s.Color = color; s.Thickness = thick; s.Transparency = 0.4; return s end
+local function corner(r)
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, r)
+    return c
+end
+
+local function stroke(color, thick)
+    local s = Instance.new("UIStroke")
+    s.Color = color
+    s.Thickness = thick
+    s.Transparency = 0.4
+    return s
+end
+
 local function tween(obj, props, dur)
-    TweenService:Create(obj, TweenInfo.new(dur or 0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), props):Play()
+    TweenService:Create(
+        obj,
+        TweenInfo.new(dur or 0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        props
+    ):Play()
 end
 
 --====================================================================
@@ -40,7 +58,8 @@ function Library:CreateWindow(title, openKey, floatIconId)
 
     local Player = game:GetService("Players").LocalPlayer
     local Gui = Instance.new("ScreenGui")
-    Gui.Name = "MenuUI"; Gui.ResetOnSpawn = false
+    Gui.Name = "MenuUI"
+    Gui.ResetOnSpawn = false
     Gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     Gui.Parent = Player:WaitForChild("PlayerGui")
 
@@ -76,8 +95,10 @@ function Library:CreateWindow(title, openKey, floatIconId)
     BtnSettings.Size = UDim2.new(0, 38, 0, 38)
     BtnSettings.Position = UDim2.new(1, -96, 0, 7)
     BtnSettings.BackgroundColor3 = THEME.Card
-    BtnSettings.Text = "⚙"; BtnSettings.TextColor3 = THEME.Text
-    BtnSettings.TextSize = 20; BtnSettings.Font = Enum.Font.GothamBold
+    BtnSettings.Text = "⚙"
+    BtnSettings.TextColor3 = THEME.Text
+    BtnSettings.TextSize = 20
+    BtnSettings.Font = Enum.Font.GothamBold
     BtnSettings.Parent = TitleBar
     corner(10).Parent = BtnSettings
 
@@ -86,8 +107,10 @@ function Library:CreateWindow(title, openKey, floatIconId)
     BtnClose.Size = UDim2.new(0, 38, 0, 38)
     BtnClose.Position = UDim2.new(1, -50, 0, 7)
     BtnClose.BackgroundColor3 = THEME.Card
-    BtnClose.Text = "✕"; BtnClose.TextColor3 = THEME.Text
-    BtnClose.TextSize = 18; BtnClose.Font = Enum.Font.GothamBold
+    BtnClose.Text = "✕"
+    BtnClose.TextColor3 = THEME.Text
+    BtnClose.TextSize = 18
+    BtnClose.Font = Enum.Font.GothamBold
     BtnClose.Parent = TitleBar
     corner(10).Parent = BtnClose
 
@@ -110,7 +133,8 @@ function Library:CreateWindow(title, openKey, floatIconId)
     LblCat.BackgroundTransparency = 1
     LblCat.Text = "DANH MỤC"
     LblCat.TextColor3 = THEME.SubText
-    LblCat.TextSize = 14; LblCat.Font = Enum.Font.GothamBold
+    LblCat.TextSize = 14
+    LblCat.Font = Enum.Font.GothamBold
     LblCat.Parent = Sidebar
 
     local TabList = Instance.new("Frame")
@@ -119,7 +143,8 @@ function Library:CreateWindow(title, openKey, floatIconId)
     TabList.BackgroundTransparency = 1
     TabList.Parent = Sidebar
     local TabLayout = Instance.new("UIListLayout")
-    TabLayout.Padding = UDim.new(0, 8); TabLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    TabLayout.Padding = UDim.new(0, 8)
+    TabLayout.SortOrder = Enum.SortOrder.LayoutOrder
     TabLayout.Parent = TabList
 
     ---------- Content (chứa tab) ----------
@@ -149,55 +174,74 @@ function Library:CreateWindow(title, openKey, floatIconId)
     SettingsPanel.Parent = Main
 
     local SetList = Instance.new("UIListLayout")
-    SetList.Padding = UDim.new(0, 10); SetList.SortOrder = Enum.SortOrder.LayoutOrder
+    SetList.Padding = UDim.new(0, 10)
+    SetList.SortOrder = Enum.SortOrder.LayoutOrder
     SetList.Parent = SettingsPanel
     local SetPad = Instance.new("UIPadding")
-    SetPad.PaddingTop = UDim.new(0, 2); SetPad.PaddingBottom = UDim.new(0, 2)
+    SetPad.PaddingTop = UDim.new(0, 2)
+    SetPad.PaddingBottom = UDim.new(0, 2)
     SetPad.Parent = SettingsPanel
 
-    -- Tiêu đề settings
     local SetTitle = Instance.new("TextLabel")
     SetTitle.Size = UDim2.new(1, 0, 0, 28)
     SetTitle.BackgroundTransparency = 1
     SetTitle.Text = "| THÔNG TIN"
     SetTitle.TextColor3 = THEME.Accent
-    SetTitle.TextSize = 17; SetTitle.Font = Enum.Font.GothamBold
+    SetTitle.TextSize = 17
+    SetTitle.Font = Enum.Font.GothamBold
     SetTitle.TextXAlignment = Enum.TextXAlignment.Left
     SetTitle.Parent = SettingsPanel
 
-    -- Hàm tạo dòng info (full width)
+    -- Dòng info full-width
     local function infoRow(icon, label, value)
         local Row = Instance.new("Frame")
         Row.Size = UDim2.new(1, 0, 0, 48)
         Row.BackgroundColor3 = THEME.Card
         Row.Parent = SettingsPanel
         corner(12).Parent = Row
+
         local Ico = Instance.new("TextLabel")
-        Ico.Size = UDim2.new(0, 40, 1, 0); Ico.Position = UDim2.new(0, 6, 0, 0)
-        Ico.BackgroundTransparency = 1; Ico.Text = icon
-        Ico.TextColor3 = THEME.Accent; Ico.TextSize = 20
+        Ico.Size = UDim2.new(0, 40, 1, 0)
+        Ico.Position = UDim2.new(0, 6, 0, 0)
+        Ico.BackgroundTransparency = 1
+        Ico.Text = icon
+        Ico.TextColor3 = THEME.Accent
+        Ico.TextSize = 20
         Ico.Parent = Row
+
         local Lbl = Instance.new("TextLabel")
-        Lbl.Size = UDim2.new(0.5, 0, 1, 0); Lbl.Position = UDim2.new(0, 48, 0, 0)
-        Lbl.BackgroundTransparency = 1; Lbl.Text = label
-        Lbl.TextColor3 = THEME.SubText; Lbl.TextSize = 15
-        Lbl.Font = Enum.Font.GothamSemibold; Lbl.TextXAlignment = Enum.TextXAlignment.Left
+        Lbl.Size = UDim2.new(0.5, 0, 1, 0)
+        Lbl.Position = UDim2.new(0, 48, 0, 0)
+        Lbl.BackgroundTransparency = 1
+        Lbl.Text = label
+        Lbl.TextColor3 = THEME.SubText
+        Lbl.TextSize = 15
+        Lbl.Font = Enum.Font.GothamSemibold
+        Lbl.TextXAlignment = Enum.TextXAlignment.Left
         Lbl.Parent = Row
+
         local Val = Instance.new("TextLabel")
-        Val.Size = UDim2.new(0.5, -16, 1, 0); Val.Position = UDim2.new(0.5, 0, 0, 0)
-        Val.BackgroundTransparency = 1; Val.Text = value
-        Val.TextColor3 = THEME.Text; Val.TextSize = 15
-        Val.Font = Enum.Font.GothamBold; Val.TextXAlignment = Enum.TextXAlignment.Right
+        Val.Size = UDim2.new(0.5, -16, 1, 0)
+        Val.Position = UDim2.new(0.5, 0, 0, 0)
+        Val.BackgroundTransparency = 1
+        Val.Text = value
+        Val.TextColor3 = THEME.Text
+        Val.TextSize = 15
+        Val.Font = Enum.Font.GothamBold
+        Val.TextXAlignment = Enum.TextXAlignment.Right
         Val.Parent = Row
         return Val
     end
 
     local device = "PC"
-    if UIS.TouchEnabled and not UIS.KeyboardEnabled then device = "Mobile"
-    elseif UIS.GamepadEnabled and not UIS.KeyboardEnabled then device = "Console" end
+    if UIS.TouchEnabled and not UIS.KeyboardEnabled then
+        device = "Mobile"
+    elseif UIS.GamepadEnabled and not UIS.KeyboardEnabled then
+        device = "Console"
+    end
 
-    local RowPlayer = infoRow("👤", "Người chơi", Player.Name)
-    local RowDevice = infoRow("📱", "Thiết bị", device)
+    infoRow("👤", "Người chơi", Player.Name)
+    infoRow("📱", "Thiết bị", device)
 
     -- Grid thẻ thông số (3 cột)
     local Grid = Instance.new("Frame")
@@ -217,36 +261,48 @@ function Library:CreateWindow(title, openKey, floatIconId)
         Card.BackgroundColor3 = THEME.Card
         Card.Parent = Grid
         corner(12).Parent = Card
+
         local Ico = Instance.new("TextLabel")
-        Ico.Size = UDim2.new(1, 0, 0, 26); Ico.Position = UDim2.new(0, 0, 0, 8)
-        Ico.BackgroundTransparency = 1; Ico.Text = icon
-        Ico.TextColor3 = THEME.Accent; Ico.TextSize = 18
+        Ico.Size = UDim2.new(1, 0, 0, 26)
+        Ico.Position = UDim2.new(0, 0, 0, 8)
+        Ico.BackgroundTransparency = 1
+        Ico.Text = icon
+        Ico.TextColor3 = THEME.Accent
+        Ico.TextSize = 18
         Ico.Parent = Card
+
         local Val = Instance.new("TextLabel")
-        Val.Size = UDim2.new(1, 0, 0, 32); Val.Position = UDim2.new(0, 0, 0, 32)
-        Val.BackgroundTransparency = 1; Val.Text = "--"
-        Val.TextColor3 = THEME.White; Val.TextSize = 24
+        Val.Size = UDim2.new(1, 0, 0, 32)
+        Val.Position = UDim2.new(0, 0, 0, 32)
+        Val.BackgroundTransparency = 1
+        Val.Text = "--"
+        Val.TextColor3 = THEME.White
+        Val.TextSize = 24
         Val.Font = Enum.Font.GothamBold
         Val.Parent = Card
+
         local Lbl = Instance.new("TextLabel")
-        Lbl.Size = UDim2.new(1, 0, 0, 22); Lbl.Position = UDim2.new(0, 0, 1, -26)
-        Lbl.BackgroundTransparency = 1; Lbl.Text = label
-        Lbl.TextColor3 = THEME.SubText; Lbl.TextSize = 13
+        Lbl.Size = UDim2.new(1, 0, 0, 22)
+        Lbl.Position = UDim2.new(0, 0, 1, -26)
+        Lbl.BackgroundTransparency = 1
+        Lbl.Text = label
+        Lbl.TextColor3 = THEME.SubText
+        Lbl.TextSize = 13
         Lbl.Font = Enum.Font.GothamSemibold
         Lbl.Parent = Card
         return Val
     end
 
-    local CardFPS    = statCard("⏱", "FPS")
-    local CardPing   = statCard("📶", "Ping (ms)")
-    local CardRAM    = statCard("💾", "RAM (MB)")
-    local CardGPU    = statCard("🎨", "Đồ họa")
-    local CardAcc    = statCard("📅", "Tuổi TK (ngày)")
-    local CardGame   = statCard("🎮", "Game")
+    local CardFPS  = statCard("⏱", "FPS")
+    local CardPing = statCard("📶", "Ping (ms)")
+    local CardRAM  = statCard("💾", "RAM (MB)")
+    local CardGPU  = statCard("🎨", "Đồ họa")
+    local CardAcc  = statCard("📅", "Tuổi TK (ngày)")
+    local CardGame = statCard("🎮", "Game")
     CardGame.Text = string.sub(game.Name, 1, 12)
     CardAcc.Text = tostring(Player.AccountAge)
 
-    -- Cập nhật live FPS / Ping / RAM mỗi giây
+    -- Cập nhật live mỗi giây
     local frames, fps = 0, 0
     local lastTick = tick()
     RunService.RenderStepped:Connect(function() frames += 1 end)
@@ -255,16 +311,20 @@ function Library:CreateWindow(title, openKey, floatIconId)
             task.wait(1)
             local now = tick()
             fps = math.floor(frames / (now - lastTick) + 0.5)
-            frames = 0; lastTick = now
+            frames = 0
+            lastTick = now
             CardFPS.Text = tostring(fps)
+
             local ok, ping = pcall(function()
                 return game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()
             end)
             if ok then CardPing.Text = tostring(math.floor(ping)) end
+
             local ok2, mem = pcall(function()
                 return game:GetService("Stats"):GetTotalMemoryUsageMb()
             end)
             if ok2 then CardRAM.Text = tostring(math.floor(mem)) end
+
             local ok3, q = pcall(function()
                 return UserSettings():GetService("UserGameSettings").SavedQualityLevel.Name
             end)
@@ -277,7 +337,9 @@ function Library:CreateWindow(title, openKey, floatIconId)
         self.InSettings = not self.InSettings
         Content.Visible = not self.InSettings
         SettingsPanel.Visible = self.InSettings
-        tween(BtnSettings, {BackgroundColor3 = self.InSettings and THEME.Accent or THEME.Card}, 0.15)
+        tween(BtnSettings, {
+            BackgroundColor3 = self.InSettings and THEME.Accent or THEME.Card
+        }, 0.15)
     end
     BtnSettings.MouseButton1Click:Connect(toggleSettings)
 
@@ -285,20 +347,28 @@ function Library:CreateWindow(title, openKey, floatIconId)
     local dragging, dragInput, dragStart, startPos
     TitleBar.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true; dragStart = input.Position; startPos = Main.Position
+            dragging = true
+            dragStart = input.Position
+            startPos = Main.Position
             input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then dragging = false end
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
             end)
         end
     end)
     TitleBar.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then dragInput = input end
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
     end)
     UIS.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
             local delta = input.Position - dragStart
-            Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
-                                      startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            Main.Position = UDim2.new(
+                startPos.X.Scale, startPos.X.Offset + delta.X,
+                startPos.Y.Scale, startPos.Y.Offset + delta.Y
+            )
         end
     end)
 
@@ -320,28 +390,37 @@ function Library:CreateWindow(title, openKey, floatIconId)
     FloatLbl.BackgroundTransparency = 1
     FloatLbl.Text = "☰"
     FloatLbl.TextColor3 = THEME.White
-    FloatLbl.TextSize = 26; FloatLbl.Font = Enum.Font.GothamBold
+    FloatLbl.TextSize = 26
+    FloatLbl.Font = Enum.Font.GothamBold
     FloatLbl.Parent = Floating
 
     -- Kéo thả nút tròn
     local fDrag, fInput, fStart, fPos
     Floating.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            fDrag = true; fStart = input.Position; fPos = Floating.Position
+            fDrag = true
+            fStart = input.Position
+            fPos = Floating.Position
         end
     end)
     Floating.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then fInput = input end
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            fInput = input
+        end
     end)
     UIS.InputChanged:Connect(function(input)
         if input == fInput and fDrag then
             local delta = input.Position - fStart
-            Floating.Position = UDim2.new(fPos.X.Scale, fPos.X.Offset + delta.X,
-                                          fPos.Y.Scale, fPos.Y.Offset + delta.Y)
+            Floating.Position = UDim2.new(
+                fPos.X.Scale, fPos.X.Offset + delta.X,
+                fPos.Y.Scale, fPos.Y.Offset + delta.Y
+            )
         end
     end)
     UIS.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then fDrag = false end
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            fDrag = false
+        end
     end)
 
     -- Bấm nút tròn → mở menu
@@ -360,7 +439,8 @@ function Library:CreateWindow(title, openKey, floatIconId)
     UIS.InputBegan:Connect(function(input)
         if input.KeyCode == openKey then
             if Floating.Visible then
-                Floating.Visible = false; Main.Visible = true
+                Floating.Visible = false
+                Main.Visible = true
             else
                 Main.Visible = not Main.Visible
             end
@@ -372,10 +452,14 @@ function Library:CreateWindow(title, openKey, floatIconId)
         Floating.Image = assetId or ""
         FloatLbl.Visible = (not assetId or assetId == "")
     end
-    if floatIconId then self:SetFloatingIcon(floatIconId) end
+    if floatIconId then
+        self:SetFloatingIcon(floatIconId)
+    end
 
-    self.Main = Main; self.Gui = Gui
-    self.TabList = TabList; self.Content = Content
+    self.Main = Main
+    self.Gui = Gui
+    self.TabList = TabList
+    self.Content = Content
     self.SettingsPanel = SettingsPanel
     self.ToggleSettings = toggleSettings
     return self
@@ -386,14 +470,17 @@ end
 --====================================================================
 function Library:CreateTab(name)
     local win = self
-    local tab = {}; tab.Name = name; tab.Elements = {}
+    local tab = {}
+    tab.Name = name
+    tab.Elements = {}
 
     local Btn = Instance.new("TextButton")
     Btn.Size = UDim2.new(1, 0, 0, 42)
     Btn.BackgroundColor3 = THEME.Card
     Btn.Text = "  " .. name
     Btn.TextColor3 = THEME.SubText
-    Btn.TextSize = 15; Btn.Font = Enum.Font.GothamSemibold
+    Btn.TextSize = 15
+    Btn.Font = Enum.Font.GothamSemibold
     Btn.TextXAlignment = Enum.TextXAlignment.Left
     Btn.Parent = win.TabList
     corner(10).Parent = Btn
@@ -405,15 +492,19 @@ function Library:CreateTab(name)
     Container.Visible = false
     Container.Parent = win.Content
     local Layout = Instance.new("UIListLayout")
-    Layout.Padding = UDim.new(0, 10); Layout.SortOrder = Enum.SortOrder.LayoutOrder
+    Layout.Padding = UDim.new(0, 10)
+    Layout.SortOrder = Enum.SortOrder.LayoutOrder
     Layout.Parent = Container
     local Pad = Instance.new("UIPadding")
-    Pad.PaddingTop = UDim.new(0, 2); Pad.PaddingBottom = UDim.new(0, 2)
+    Pad.PaddingTop = UDim.new(0, 2)
+    Pad.PaddingBottom = UDim.new(0, 2)
     Pad.Parent = Container
 
     local function select()
         -- Bấm tab thì tự thoát khỏi settings
-        if win.InSettings then win.ToggleSettings() end
+        if win.InSettings then
+            win.ToggleSettings()
+        end
         for _, t in ipairs(win.Tabs) do
             t.Button.BackgroundColor3 = THEME.Card
             t.Button.TextColor3 = THEME.SubText
@@ -424,9 +515,12 @@ function Library:CreateTab(name)
         Container.Visible = true
     end
     Btn.MouseButton1Click:Connect(select)
-    if #win.Tabs == 0 then select() end
+    if #win.Tabs == 0 then
+        select()
+    end
 
-    tab.Button = Btn; tab.Container = Container
+    tab.Button = Btn
+    tab.Container = Container
     table.insert(win.Tabs, tab)
 
     ---------- TOGGLE ----------
@@ -442,45 +536,65 @@ function Library:CreateTab(name)
         Dot.Size = UDim2.new(0, 10, 0, 10)
         Dot.Position = UDim2.new(0, 16, 0.5, -5)
         Dot.BackgroundColor3 = THEME.SubText
-        Dot.Parent = Row; corner(5).Parent = Dot
+        Dot.Parent = Row
+        corner(5).Parent = Dot
 
         local Lbl = Instance.new("TextLabel")
-        Lbl.Size = UDim2.new(1, -100, 1, 0); Lbl.Position = UDim2.new(0, 38, 0, 0)
-        Lbl.BackgroundTransparency = 1; Lbl.Text = label
-        Lbl.TextColor3 = THEME.Text; Lbl.TextSize = 16
-        Lbl.Font = Enum.Font.GothamSemibold; Lbl.TextXAlignment = Enum.TextXAlignment.Left
+        Lbl.Size = UDim2.new(1, -100, 1, 0)
+        Lbl.Position = UDim2.new(0, 38, 0, 0)
+        Lbl.BackgroundTransparency = 1
+        Lbl.Text = label
+        Lbl.TextColor3 = THEME.Text
+        Lbl.TextSize = 16
+        Lbl.Font = Enum.Font.GothamSemibold
+        Lbl.TextXAlignment = Enum.TextXAlignment.Left
         Lbl.Parent = Row
 
         local Switch = Instance.new("TextButton")
         Switch.Size = UDim2.new(0, 48, 0, 26)
         Switch.Position = UDim2.new(1, -64, 0.5, -13)
         Switch.BackgroundColor3 = THEME.ToggleOff
-        Switch.Text = ""; Switch.Parent = Row
+        Switch.Text = ""
+        Switch.Parent = Row
         corner(13).Parent = Switch
 
         local Knob = Instance.new("Frame")
         Knob.Size = UDim2.new(0, 20, 0, 20)
         Knob.Position = UDim2.new(0, 3, 0.5, -10)
         Knob.BackgroundColor3 = THEME.White
-        Knob.Parent = Switch; corner(10).Parent = Knob
+        Knob.Parent = Switch
+        corner(10).Parent = Knob
 
         local function apply()
             if state then
-                tween(Switch, {BackgroundColor3 = THEME.Accent})
-                tween(Knob, {Position = UDim2.new(1, -23, 0.5, -10)})
+                tween(Switch, { BackgroundColor3 = THEME.Accent })
+                tween(Knob, { Position = UDim2.new(1, -23, 0.5, -10) })
                 Dot.BackgroundColor3 = THEME.Accent
             else
-                tween(Switch, {BackgroundColor3 = THEME.ToggleOff})
-                tween(Knob, {Position = UDim2.new(0, 3, 0.5, -10)})
+                tween(Switch, { BackgroundColor3 = THEME.ToggleOff })
+                tween(Knob, { Position = UDim2.new(0, 3, 0.5, -10) })
                 Dot.BackgroundColor3 = THEME.SubText
             end
         end
+
         Switch.MouseButton1Click:Connect(function()
-            state = not state; apply()
-            if callback then callback(state) end
+            state = not state
+            apply()
+            if callback then
+                callback(state)
+            end
         end)
+
         table.insert(tab.Elements, Row)
-        return { Set = function(v) state = v; apply(); if callback then callback(state) end end }
+        return {
+            Set = function(v)
+                state = v
+                apply()
+                if callback then
+                    callback(state)
+                end
+            end,
+        }
     end
 
     ---------- SLIDER ----------
@@ -489,14 +603,114 @@ function Library:CreateTab(name)
         local Row = Instance.new("Frame")
         Row.Size = UDim2.new(1, 0, 0, 60)
         Row.BackgroundColor3 = THEME.Card
-        Row.Parent = Container; corner(12).Parent = Row
+        Row.Parent = Container
+        corner(12).Parent = Row
 
         local Lbl = Instance.new("TextLabel")
-        Lbl.Size = UDim2.new(1, -80, 0, 24); Lbl.Position = UDim2.new(0, 16, 0, 8)
-        Lbl.BackgroundTransparency = 1; Lbl.Text = label
-        Lbl.TextColor3 = THEME.Text; Lbl.TextSize = 15
-        Lbl.Font = Enum.Font.GothamSemibold; Lbl.TextXAlignment = Enum.TextXAlignment.Left
+        Lbl.Size = UDim2.new(1, -80, 0, 24)
+        Lbl.Position = UDim2.new(0, 16, 0, 8)
+        Lbl.BackgroundTransparency = 1
+        Lbl.Text = label
+        Lbl.TextColor3 = THEME.Text
+        Lbl.TextSize = 15
+        Lbl.Font = Enum.Font.GothamSemibold
+        Lbl.TextXAlignment = Enum.TextXAlignment.Left
         Lbl.Parent = Row
 
         local ValLbl = Instance.new("TextLabel")
-        ValLbl.Size = UDim2.new(0, 60, 0, 24); Val
+        ValLbl.Size = UDim2.new(0, 60, 0, 24)
+        ValLbl.Position = UDim2.new(1, -76, 0, 8)
+        ValLbl.BackgroundTransparency = 1
+        ValLbl.Text = tostring(value)
+        ValLbl.TextColor3 = THEME.Accent
+        ValLbl.TextSize = 15
+        ValLbl.Font = Enum.Font.GothamBold
+        ValLbl.Parent = Row
+
+        local Track = Instance.new("Frame")
+        Track.Size = UDim2.new(1, -32, 0, 6)
+        Track.Position = UDim2.new(0, 16, 0, 42)
+        Track.BackgroundColor3 = THEME.ToggleOff
+        Track.Parent = Row
+        corner(3).Parent = Track
+
+        local Fill = Instance.new("Frame")
+        Fill.Size = UDim2.new((value - min) / (max - min), 0, 1, 0)
+        Fill.BackgroundColor3 = THEME.Accent
+        Fill.Parent = Track
+        corner(3).Parent = Fill
+
+        local dragS = false
+        local function update(pos)
+            local rel = math.clamp((pos.X - Track.AbsolutePosition.X) / Track.AbsoluteSize.X, 0, 1)
+            value = math.floor(min + rel * (max - min) + 0.5)
+            Fill.Size = UDim2.new(rel, 0, 1, 0)
+            ValLbl.Text = tostring(value)
+            if callback then
+                callback(value)
+            end
+        end
+
+        Track.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragS = true
+                update(input.Position)
+            end
+        end)
+        UIS.InputChanged:Connect(function(input)
+            if dragS and input.UserInputType == Enum.UserInputType.MouseMovement then
+                update(input.Position)
+            end
+        end)
+        UIS.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragS = false
+            end
+        end)
+
+        table.insert(tab.Elements, Row)
+    end
+
+    ---------- BUTTON ----------
+    function tab:CreateButton(label, callback)
+        local Btn2 = Instance.new("TextButton")
+        Btn2.Size = UDim2.new(1, 0, 0, 44)
+        Btn2.BackgroundColor3 = THEME.Card
+        Btn2.Text = label
+        Btn2.TextColor3 = THEME.Text
+        Btn2.TextSize = 15
+        Btn2.Font = Enum.Font.GothamSemibold
+        Btn2.Parent = Container
+        corner(12).Parent = Btn2
+
+        Btn2.MouseButton1Click:Connect(function()
+            tween(Btn2, { BackgroundColor3 = THEME.Accent }, 0.1)
+            task.delay(0.12, function()
+                tween(Btn2, { BackgroundColor3 = THEME.Card }, 0.15)
+            end)
+            if callback then
+                callback()
+            end
+        end)
+
+        table.insert(tab.Elements, Btn2)
+    end
+
+    ---------- SECTION ----------
+    function tab:CreateSection(text)
+        local Sec = Instance.new("TextLabel")
+        Sec.Size = UDim2.new(1, 0, 0, 28)
+        Sec.BackgroundTransparency = 1
+        Sec.Text = "| " .. text
+        Sec.TextColor3 = THEME.Accent
+        Sec.TextSize = 17
+        Sec.Font = Enum.Font.GothamBold
+        Sec.TextXAlignment = Enum.TextXAlignment.Left
+        Sec.Parent = Container
+        table.insert(tab.Elements, Sec)
+    end
+
+    return tab
+end
+
+return Library
